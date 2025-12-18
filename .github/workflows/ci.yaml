@@ -7,6 +7,7 @@ on:
       - windows-store-distribution
   create:
     tags: [v*]
+  workflow_dispatch:
 
 jobs:
   build:
