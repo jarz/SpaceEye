@@ -46,7 +46,8 @@ let heartbeatHandle: number
 
 const log = electronLog.scope('main')
 
-Axios.defaults.adapter = require('axios/lib/adapters/http')
+// axios 1.x automatically uses the correct adapter for Node.js/Electron
+// Axios.defaults.adapter = require('axios/lib/adapters/http')
 
 Axios.defaults.headers['User-Agent'] = `SpaceEye/${APP_VERSION} (${BUILD_TYPE})`
 
@@ -428,7 +429,7 @@ ipc.answerRenderer<DownloadThumbnailIpcRequest, DownloadedThumbnailIpc>(
                 validateStatus: status => (status >= 200 && status < 300) || status === 304
             })
         } catch (error) {
-            log.error('Error while downloading thumbnail:', formatAxiosError(error))
+            log.error('Error while downloading thumbnail:', formatAxiosError(error as any))
             return {}
         }
         if (webResponse.status === 304) {
