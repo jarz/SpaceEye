@@ -1,17 +1,23 @@
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const baseConfig = require('./webpack.base.config')
 
-module.exports = merge.smart(baseConfig, {
+module.exports = merge(baseConfig, {
     target: 'electron-renderer',
     entry: {
-        app: ['@babel/polyfill', './src/renderer/app.tsx']
+        app: './src/renderer/app.tsx'
     },
     module: {
         rules: [
+            {
+                test: /\.m?js$/,
+                resolve: {
+                    fullySpecified: false
+                }
+            },
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
@@ -29,35 +35,22 @@ module.exports = merge.smart(baseConfig, {
             },
             {
                 test: /\.scss$/,
-                loaders: ['style-loader', 'css-loader', 'sass-loader']
+                use: ['style-loader', 'css-loader', 'sass-loader']
             },
             {
                 test: /\.css$/,
-                loaders: ['style-loader', 'css-loader']
+                use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.(woff|woff2|eot|ttf)$/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            name: '[name].[ext]',
-                            outputPath: 'fonts/'
-                        }
-                    }
-                ]
+                type: 'asset/resource',
+                generator: {
+                    filename: 'fonts/[name][ext]'
+                }
             },
             {
                 test: /\.(gif|png|jpe?g|svg)$/,
-                use: [
-                    'file-loader',
-                    {
-                        loader: 'image-webpack-loader',
-                        options: {
-                            disable: true
-                        }
-                    }
-                ]
+                type: 'asset/resource'
             },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
@@ -69,9 +62,10 @@ module.exports = merge.smart(baseConfig, {
     },
     plugins: [
         new ForkTsCheckerWebpackPlugin({
-            reportFiles: ['src/renderer/**/*']
+            typescript: {
+                configFile: 'tsconfig.json'
+            }
         }),
-        new webpack.NamedModulesPlugin(),
         new HtmlWebpackPlugin({
             title: 'SpaceEye'
         }),
